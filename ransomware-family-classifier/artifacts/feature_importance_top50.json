@@ -1,0 +1,74 @@
+[
+  {
+    "feature": "apis",
+    "gain": 169423.05585424555
+  },
+  {
+    "feature": "files_text",
+    "gain": 134872.69813624537
+  },
+  {
+    "feature": "processes_malicious",
+    "gain": 111057.7655462357
+  },
+  {
+    "feature": "files_suspicious",
+    "gain": 109213.40718898056
+  },
+  {
+    "feature": "files_malicious",
+    "gain": 92388.37721666195
+  },
+  {
+    "feature": "dlls_calls",
+    "gain": 83690.23326150943
+  },
+  {
+    "feature": "processes_monitored",
+    "gain": 66406.2066405839
+  },
+  {
+    "feature": "registry_total",
+    "gain": 65865.45197945036
+  },
+  {
+    "feature": "registry_read",
+    "gain": 65138.21078595345
+  },
+  {
+    "feature": "network_http",
+    "gain": 59673.46935994065
+  },
+  {
+    "feature": "files_unknown",
+    "gain": 51119.355936787906
+  },
+  {
+    "feature": "network_connections",
+    "gain": 49523.83973413864
+  },
+  {
+    "feature": "network_dns",
+    "gain": 48048.3652143991
+  },
+  {
+    "feature": "total_procsses",
+    "gain": 41420.505084811055
+  },
+  {
+    "feature": "registry_write",
+    "gain": 25017.8218788207
+  },
+  {
+    "feature": "processes_suspicious",
+    "gain": 9326.10077931262
+  },
+  {
+    "feature": "registry_delete",
+    "gain": 2984.280533000941
+  },
+  {
+    "feature": "network_threats",
+    "gain": 0.0
+  }
+]

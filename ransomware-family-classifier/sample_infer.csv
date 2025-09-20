@@ -1,0 +1,2 @@
+# Put a few rows from your ransom.csv here for testing inference.
+# The script will align to the trained feature list and fill missing columns with -1.

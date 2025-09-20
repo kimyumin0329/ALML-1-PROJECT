@@ -1,0 +1,35 @@
+# Training/Inference configuration
+dataset_path: "./ransom.csv"   # path to your dataset CSV
+output_dir: "./artifacts"
+
+target_col: "Family"           # Scenario C
+drop_cols: ["md5", "sha1", "file_extension", "Class", "Category"]
+
+# If a family has fewer samples than this, map it to "Other".
+# Set to 0 to disable.
+label_min_count: 20
+use_other_class: true
+other_label_name: "Other"
+
+# Split
+test_size: 0.2
+random_state: 42
+n_splits: 5   # Stratified CV for evaluation
+
+# LightGBM params
+lgbm_params:
+  n_estimators: 800
+  learning_rate: 0.05
+  num_leaves: 63
+  max_depth: -1
+  subsample: 0.9
+  colsample_bytree: 0.9
+  reg_alpha: 0.0
+  reg_lambda: 0.0
+  objective: "multiclass"
+  # num_class will be set programmatically based on labels
+
+# Training options
+class_weighting: true  # use inverse-frequency weights
+scale_numeric: false   # LightGBM doesn't require scaling; keep false
+save_feature_list: true
