@@ -1,0 +1,16 @@
+pe_avg_entropy,pe_max_entropy,pe_high_entropy_section_ratio,pe_has_high_entropy_section,sample_id,category,family
+5.075,6.21,0.0,0,benign_011.json,benign,Benign
+5.21,6.33,0.0,0,benign_012.json,benign,Benign
+4.9875,6.11,0.0,0,benign_013.json,benign,Benign
+6.298,8.15,0.4,1,cryptxxx_010.json,ransomware,CryptXXX
+6.228,8.04,0.4,1,dharma_004.json,ransomware,Dharma
+6.288,8.18,0.4,1,gandcrab_007.json,ransomware,GandCrab
+6.348000000000001,8.05,0.4,1,globeimposter_005.json,ransomware,GlobeImposter
+6.25,8.12,0.4,1,lockbit_001.json,ransomware,LockBit
+6.354,8.14,0.4,1,maze_008.json,ransomware,Maze
+6.308,8.1,0.4,1,medusalocker_006.json,ransomware,MedusaLocker
+6.3825,8.45,0.5,1,packed_themida_015.json,packed,Themida_Packed
+7.3,8.31,0.6666666666666666,1,packed_upx_014.json,packed,UPX_Packed
+6.294,8.03,0.4,1,phobos_003.json,ransomware,Phobos
+6.3660000000000005,8.21,0.4,1,stopdjvu_002.json,ransomware,STOP_DJVU
+6.266,8.22,0.4,1,wannacry_009.json,ransomware,WannaCry

@@ -1,0 +1,14 @@
+file_read_count,file_write_count,file_delete_count,file_rename_count,file_encrypt_like_count,process_create_count,process_inject_count,process_suspend_count,process_resume_count,network_dns_count,network_http_count,network_connection_count,registry_create_count,registry_set_count,registry_delete_count,registry_persistence_flag,mutex_count,dropped_file_count,suspicious_extension_flag,crypto_keyword_flag,sample_id
+0,24,0,0,0,117,0,0,0,0,0,2,28,27,3,1,0,0,0,1,cmd_lsass_memory_dumpert_syscalls_2020-10-1822561997.json
+2,148,0,2,0,280,0,0,0,3,0,16,47,43,15,1,0,0,0,1,cmd_psexec_lsa_secrets_dump_2020-10-1903305471.json
+0,61,0,0,0,912,0,0,0,0,0,2,287,248,83,1,0,0,0,1,cmd_sam_copy_esentutl_2020-10-1900290001.json
+0,93,2,0,0,266,0,0,0,4,0,15,58,38,12,1,0,0,0,1,cmd_sharpview_pcre_net_2020-10-2920232423.json
+104,8,0,3,0,56,0,0,0,7,10,117,34,63,34,1,0,0,0,1,covenant_sharpsc_query_dcerpc_smb_svcctl_2020-08-06012009.json
+421,32,3,5,0,2376,0,0,0,97,8,256,2271,3909,2281,1,0,0,0,1,covenant_sharpsc_start_dcerpc_smb_svcctl_2020-08-06030120.json
+429,62,37,0,0,480,0,0,0,12,1,113,420,912,420,1,0,0,0,1,empire_launcher_vbs_2020-09-04160940.json
+140,15,0,3,0,286,0,0,0,65,0,601,154,369,154,1,0,0,0,1,empire_mimikatz_logonpasswords_2020-08-07103224.json
+421,13,30,14,0,125,0,0,0,1,4,61,0,186,63,1,0,0,0,1,empire_mimikatz_sam_access_2020-09-22041117.json
+54,2844,464,6,0,11311,0,5,0,1305,676,1477,1963,1069,1257,1,0,0,0,1,empire_ninjacopy_dumping_ntds_dit_file.json
+299,24,9,4,0,179,0,0,0,98,7,183,3,1521,215,1,0,0,0,1,empire_over_pth_patch_lsass_2020-09-21221336.json
+1032,212,236,1,0,1857,0,0,0,41,10,417,1741,2796,1808,1,0,0,0,1,msf_record_mic_2020-06-09225055.json
+0,8,0,0,0,109,0,0,0,2,1,10,28,25,13,1,0,0,0,0,psh_powershell_httplistener_2020-11-0204130683.json
