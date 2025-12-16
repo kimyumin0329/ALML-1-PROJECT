@@ -1,0 +1,66 @@
+src/
+├── api/
+│   ├── DashboardApi.js
+│   ├── HttpClient.js
+│   ├── LogsApi.js
+│   ├── NotificationsApi.js
+│   ├── ScanApi.js
+│   ├── SettingApi.js
+│   └── WatcherApi.js
+├── components/
+│   ├── common/
+│   │   ├── Button.jsx            (0바이트/빈 파일)
+│   │   ├── HeaderBar.jsx         (0바이트/빈 파일)
+│   │   ├── Modal.jsx             (0바이트/빈 파일)
+│   │   ├── NavSidebar.jsx
+│   │   ├── ProgressBar.jsx       (0바이트/빈 파일)
+│   │   └── Table.jsx             (0바이트/빈 파일)
+│   ├── folders/
+│   │   └── FolderListManager.jsx
+│   ├── logs/
+│   │   ├── LogDetailModal.jsx
+│   │   ├── LogFilterBar.jsx
+│   │   └── LogTable.jsx
+│   ├── notifications/
+│   │   ├── NotificationDetailView.jsx
+│   │   ├── NotificationItem.jsx
+│   │   ├── NotificationList.jsx
+│   │   └── NotificationStatusChart.jsx
+│   └── protection/
+│       ├── ProtectionStatusBadge.jsx
+│       ├── RecentEventsPanel.jsx
+│       └── ScanControlPanel.jsx
+├── hooks/
+│   ├── UseExceptions.js
+│   ├── UseLogs.js
+│   ├── UseNotifications.js
+│   ├── UseProtectionStatus.js
+│   └── UseWatchedFolders.js
+├── layout/
+│   └── MainLayout.jsx
+├── pages/
+│   ├── logs/LogsPage.jsx
+│   ├── mainboard/MainBoardPage.jsx
+│   ├── notifications/
+│   │   ├── NotificationDetailPage.jsx
+│   │   ├── NotificationPage.jsx
+│   │   └── NotificationStatsPage.jsx
+│   └── settings/
+│       ├── SettingExceptionsPage.jsx
+│       ├── SettingFeedbackPage.jsx
+│       ├── SettingFoldersPage.jsx
+│       ├── SettingHomePage.jsx
+│       ├── SettingNotifyPage.jsx
+│       ├── SettingResetPage.jsx
+│       └── SettingUpdatePage.jsx
+├── styles/
+│   ├── component.css
+│   └── layout.css
+├── App.css
+├── App.js
+├── App.test.js
+├── index.css
+├── index.js
+├── logo.svg
+├── reportWebVitals.js
+└── setupTests.js
