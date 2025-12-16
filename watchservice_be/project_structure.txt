@@ -1,0 +1,82 @@
+watchservice_agent/
+├── WatchserviceAgentApplication.java
+├── ai/
+│   ├── AiController.java
+│   ├── AiService.java
+│   ├── domain/
+│   │   └── AiResult.java
+│   └── dto/
+│       ├── AiPayload.java
+│       └── AiResponse.java
+├── alerts/
+│   ├── AlertController.java
+│   ├── AlertService.java
+│   └── dto/
+│       ├── AlertPageResponse.java
+│       ├── AlertStatsResponse.java
+│       └── AlertStatusResponse.java
+├── analytics/
+│   └── EventWindowAggregator.java
+├── collector/
+│   ├── FileCollectorService.java
+│   ├── dto/
+│   │   └── FileAnalysisResult.java
+│   ├── business/
+│   │   ├── EntropyAnalyzer.java
+│   │   └── HashCalculator.java
+│   └── snapshot/
+│       ├── FileSnapshotStore.java
+│       └── SnapshotConfig.java
+├── common/
+│   ├── config/
+│   │   └── WebConfig.java
+│   └── util/
+│       └── SessionIdManager.java
+├── dashboard/
+│   ├── DashboardController.java
+│   └── dto/
+│       └── DashboardSummaryResponse.java
+├── scan/
+│   ├── ScanController.java
+│   ├── ScanService.java
+│   ├── domain/
+│   │   ├── ScanJob.java
+│   │   └── ScanStatus.java
+│   └── dto/
+│       ├── ScanPauseResponse.java
+│       ├── ScanProgressResponse.java
+│       ├── ScanStartRequest.java
+│       └── ScanStartResponse.java
+├── settings/
+│   ├── SettingsController.java
+│   ├── SettingsRepository.java
+│   ├── SettingsService.java
+│   ├── domain/
+│   │   ├── ExceptionRule.java
+│   │   └── WatchedFolder.java
+│   └── dto/
+│       ├── ExceptionRuleRequest.java
+│       ├── ExceptionRuleResponse.java
+│       ├── WatchedFolderRequest.java
+│       └── WatchedFolderResponse.java
+├── storage/
+│   ├── LogController.java
+│   ├── LogRepository.java
+│   ├── LogService.java
+│   ├── LogWriterWorker.java
+│   ├── domain/
+│   │   └── Log.java
+│   └── dto/
+│       ├── LogDeleteRequest.java
+│       ├── LogDeleteResponse.java
+│       ├── LogExportRequest.java
+│       ├── LogPageResponse.java
+│       └── LogResponse.java
+└── watcher/
+    ├── WatcherController.java
+    ├── WatcherRepository.java
+    ├── WatcherService.java
+    ├── domain/
+    │   └── WatcherEvent.java
+    └── dto/
+        └── WatcherEventRecord.java
