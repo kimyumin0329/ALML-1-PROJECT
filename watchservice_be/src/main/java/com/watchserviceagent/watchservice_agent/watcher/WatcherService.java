@@ -15,6 +15,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 클래스 이름 : WatcherService
+ * 기능 : 지정된 폴더를 실시간으로 감시하여 파일 생성/수정/삭제 이벤트를 감지하고, 이벤트를 Collector로 전달한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,10 +37,28 @@ public class WatcherService {
     private final Map<WatchKey, Path> keyDirMap = new ConcurrentHashMap<>();
     private final List<Path> watchedRoots = new ArrayList<>();
 
+    /**
+     * 함수 이름 : startWatching
+     * 기능 : 단일 폴더 경로를 감시하기 시작한다. 내부적으로 startWatchingMultiple을 호출한다.
+     * 매개변수 : folderPath - 감시할 폴더 경로
+     * 반환값 : 없음
+     * 예외 : IOException - WatchService 생성 실패 시
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public synchronized void startWatching(String folderPath) throws IOException {
         startWatchingMultiple(List.of(folderPath));
     }
 
+    /**
+     * 함수 이름 : startWatchingMultiple
+     * 기능 : 여러 폴더 경로를 동시에 감시하기 시작한다. WatchService를 초기화하고 모든 하위 디렉토리를 재귀적으로 등록한다.
+     * 매개변수 : folderPaths - 감시할 폴더 경로 리스트
+     * 반환값 : 없음
+     * 예외 : IOException - WatchService 생성 실패 시, IllegalArgumentException - 경로가 유효하지 않을 때
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public synchronized void startWatchingMultiple(List<String> folderPaths) throws IOException {
         if (running) {
             log.info("Watcher already running. ignore startWatching request. paths={}", folderPaths);
@@ -71,6 +95,15 @@ public class WatcherService {
         log.info("Started watching roots: {}", roots);
     }
 
+    /**
+     * 함수 이름 : registerAll
+     * 기능 : 지정된 경로부터 시작하여 모든 하위 디렉토리를 재귀적으로 WatchService에 등록한다.
+     * 매개변수 : start - 등록을 시작할 루트 경로
+     * 반환값 : 없음
+     * 예외 : IOException - 파일 시스템 접근 실패 시
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     private void registerAll(Path start) throws IOException {
         Files.walkFileTree(start, new HashSet<>(), Integer.MAX_VALUE, new SimpleFileVisitor<>() {
             @Override
@@ -81,6 +114,15 @@ public class WatcherService {
         });
     }
 
+    /**
+     * 함수 이름 : register
+     * 기능 : 단일 디렉토리를 WatchService에 등록하여 CREATE/MODIFY/DELETE 이벤트를 감지할 수 있도록 한다.
+     * 매개변수 : dir - 등록할 디렉토리 경로
+     * 반환값 : 없음
+     * 예외 : IOException - 디렉토리 등록 실패 시
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     private void register(Path dir) throws IOException {
         WatchKey key = dir.register(
                 watchService,
@@ -92,6 +134,14 @@ public class WatcherService {
         log.debug("Registered directory for watching: {}", dir);
     }
 
+    /**
+     * 함수 이름 : stopWatching
+     * 기능 : 파일 감시를 중지하고 모든 리소스를 정리한다. 남은 윈도우 이벤트를 flush한다.
+     * 매개변수 : 없음
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public synchronized void stopWatching() {
         if (!running) {
             log.info("Watcher is not running. ignore stopWatching request.");
@@ -127,6 +177,14 @@ public class WatcherService {
         log.info("Stopped watching.");
     }
 
+    /**
+     * 함수 이름 : watchLoop
+     * 기능 : WatchService에서 이벤트를 지속적으로 수신하여 처리하는 메인 루프. 각 이벤트를 Collector와 Analytics로 전달한다.
+     * 매개변수 : 없음
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     private void watchLoop() {
         String ownerKey = sessionIdManager.getSessionId();
         log.info("Watcher loop started. ownerKey={}", ownerKey);
@@ -208,6 +266,14 @@ public class WatcherService {
         }
     }
 
+    /**
+     * 함수 이름 : mapKindToEventType
+     * 기능 : WatchService의 이벤트 종류를 내부 이벤트 타입 문자열로 변환한다.
+     * 매개변수 : kind - WatchService 이벤트 종류
+     * 반환값 : "CREATE", "MODIFY", "DELETE", 또는 "UNKNOWN"
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     private String mapKindToEventType(WatchEvent.Kind<?> kind) {
         if (kind == StandardWatchEventKinds.ENTRY_CREATE) return "CREATE";
         if (kind == StandardWatchEventKinds.ENTRY_MODIFY) return "MODIFY";
@@ -215,6 +281,14 @@ public class WatcherService {
         return "UNKNOWN";
     }
 
+    /**
+     * 함수 이름 : isRunning
+     * 기능 : 현재 파일 감시가 실행 중인지 여부를 반환한다.
+     * 매개변수 : 없음
+     * 반환값 : true면 실행 중, false면 중지됨
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public boolean isRunning() {
         return running;
     }

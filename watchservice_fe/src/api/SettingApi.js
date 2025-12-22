@@ -1,6 +1,19 @@
-// src/api/SettingApi.js
+/**
+ * 파일 이름 : SettingApi.js
+ * 기능 : 설정 관련 API 함수를 제공한다. 감시 폴더, 예외 규칙, 알림 설정, 리셋, 피드백 등의 API를 포함한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
+/**
+ * 함수 이름 : request
+ * 기능 : HTTP 요청을 보내고 응답을 처리한다.
+ * 매개변수 : path - API 경로, options - 요청 옵션 (method, body)
+ * 반환값 : Promise - 응답 데이터
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 async function request(path, { method = 'GET', body } = {}) {
   const url = `${API_BASE}${path}`;
 

@@ -1,7 +1,20 @@
-// src/pages/settings/SettingHomePage.jsx
+/**
+ * 파일 이름 : SettingHomePage.jsx
+ * 기능 : 설정 메인 페이지. 각 설정 메뉴로 이동할 수 있는 카드 목록을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * 함수 이름 : SettingHomePage
+ * 기능 : 설정 메인 페이지 컴포넌트.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 설정 메인 페이지 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function SettingHomePage() {
   const navigate = useNavigate();
 

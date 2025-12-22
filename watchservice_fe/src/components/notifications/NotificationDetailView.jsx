@@ -1,5 +1,19 @@
+/**
+ * 파일 이름 : NotificationDetailView.jsx
+ * 기능 : 알림 상세 정보 뷰 컴포넌트. 알림의 모든 상세 정보를 표시한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React from 'react';
 
+/**
+ * 함수 이름 : NotificationDetailView
+ * 기능 : 알림 상세 정보 뷰 컴포넌트.
+ * 매개변수 : notification - 알림 객체
+ * 반환값 : JSX.Element - 알림 상세 정보 뷰 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 export default function NotificationDetailView({ notification }) {
   if (!notification) {
     return <p>알림 데이터가 없습니다.</p>;

@@ -27,10 +27,19 @@ public class LogResponse {
 
     private final boolean exists;
     private final long size;
+    private final Boolean existsBefore;
+    private final Long sizeBefore;
+    private final Long sizeAfter;
+    private final String extBefore;
+    private final String extAfter;
+    private final Long sizeDiff;
+    private final Double entropyDiff;
 
     private final String lastModifiedTime; // 문자열로 포맷팅
     private final String hash;
     private final Double entropy;
+    private final Double entropyBefore;
+    private final Double entropyAfter;
 
     private final String aiLabel;   // SAFE/WARNING/DANGER
     private final Double aiScore;
@@ -57,9 +66,18 @@ public class LogResponse {
                 .path(log.getPath())
                 .exists(log.isExists())
                 .size(log.getSize())
+                .existsBefore(log.getExistsBefore())
+                .sizeBefore(log.getSizeBefore())
+                .sizeAfter(log.getSizeAfter())
+                .extBefore(log.getExtBefore())
+                .extAfter(log.getExtAfter())
+                .sizeDiff(log.getSizeDiff())
+                .entropyDiff(log.getEntropyDiff())
                 .lastModifiedTime(lastModifiedStr)
                 .hash(log.getHash())
                 .entropy(log.getEntropy())
+                .entropyBefore(log.getEntropyBefore())
+                .entropyAfter(log.getEntropyAfter())
                 .aiLabel(log.getAiLabel())
                 .aiScore(log.getAiScore())
                 .aiDetail(log.getAiDetail())

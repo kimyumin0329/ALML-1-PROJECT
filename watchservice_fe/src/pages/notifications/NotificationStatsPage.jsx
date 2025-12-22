@@ -1,8 +1,21 @@
-// src/pages/notifications/NotificationStatsPage.jsx
+/**
+ * 파일 이름 : NotificationStatsPage.jsx
+ * 기능 : 알림 통계 페이지. 알림 통계를 차트로 표시한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useEffect, useMemo, useState } from 'react';
 import { fetchAlertStats } from '../../api/NotificationsApi';
 import NotificationStatusChart from '../../components/notifications/NotificationStatusChart';
 
+/**
+ * 함수 이름 : NotificationStatsPage
+ * 기능 : 알림 통계 페이지 컴포넌트.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 알림 통계 페이지 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function NotificationStatsPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

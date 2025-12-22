@@ -1,4 +1,9 @@
-// src/pages/settings/SettingNotifyPage.jsx
+/**
+ * 파일 이름 : SettingNotifyPage.jsx
+ * 기능 : 알림 방식 설정 페이지. 팝업/소리 알림을 설정할 수 있다. 백엔드가 없으면 로컬 저장소를 사용한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useEffect, useState } from 'react';
 import { fetchNotificationSettings, updateNotificationSettings } from '../../api/SettingApi';
 

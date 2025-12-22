@@ -1,7 +1,20 @@
-// src/pages/settings/SettingResetPage.jsx
+/**
+ * 파일 이름 : SettingResetPage.jsx
+ * 기능 : 설정 초기화 페이지. 로컬 설정과 서버 설정을 기본값으로 되돌린다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useState } from 'react';
 import { resetSettings } from '../../api/SettingApi';
 
+/**
+ * 함수 이름 : SettingResetPage
+ * 기능 : 설정 초기화 페이지 컴포넌트.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 설정 초기화 페이지 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function SettingResetPage() {
   const [loading, setLoading] = useState(false);
   const [note, setNote] = useState('');

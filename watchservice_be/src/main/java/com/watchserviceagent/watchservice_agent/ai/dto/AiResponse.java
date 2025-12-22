@@ -4,15 +4,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
- * AI 서버에서 반환하는 JSON 응답을 매핑하는 DTO.
+ * AI 서버 응답 DTO (두 형식 모두 수용)
  *
- * 예시 응답(JSON 가정):
+ * (A) analyze 형식(기존):
  * {
  *   "status": "ok",
- *   "label": "DANGER",
+ *   "label": "DANGER" | "WARNING" | "SAFE",
  *   "score": 0.92,
- *   "detail": "랜섬웨어 의심 패턴 감지"
+ *   "detail": "top_family=LockBit",
+ *   "message": "..."
+ * }
+ *
+ * (B) family/predict 형식(현재 네가 보여준 것):
+ * {
+ *   "topk":[{"family":"Benign","prob":0.99}, ...],
+ *   "message":"Missing ..."
  * }
  */
 @Getter
@@ -20,18 +29,60 @@ import lombok.ToString;
 @ToString
 public class AiResponse {
 
-    // 응답 상태 (예: "ok", "error")
     private String status;
 
-    // 분류 라벨 (예: "SAFE", "WARNING", "DANGER")
+    // (A) 형식
     private String label;
-
-    // 위험 점수(0.0 ~ 1.0 등)
     private Double score;
-
-    // 추가 설명/디버깅용 메시지
     private String detail;
-
-    // 오류 메시지나 부가 메모(옵션)
     private String message;
+
+    // (B) 형식
+    private List<TopK> topk;
+
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class TopK {
+        private String family;
+        private Double prob;
+    }
+
+    /** top_family 추출: detail 우선, 없으면 topk[0].family */
+    public String getTopFamily() {
+        // 1) detail에서 파싱
+        if (detail != null && !detail.isBlank()) {
+            String prefix = "top_family=";
+            int idx = detail.indexOf(prefix);
+            if (idx >= 0) {
+                String after = detail.substring(idx + prefix.length()).trim();
+                int endIdx = after.indexOf(',');
+                if (endIdx > 0) after = after.substring(0, endIdx).trim();
+                if (!after.isBlank()) return after;
+            }
+        }
+
+        // 2) topk에서 추출
+        if (topk != null && !topk.isEmpty()) {
+            String fam = topk.get(0).getFamily();
+            if (fam != null && !fam.isBlank()) return fam.trim();
+        }
+        return null;
+    }
+
+    /** top 확률 추출: score 우선, 없으면 topk[0].prob */
+    public Double getTopProb() {
+        if (score != null) return score;
+        if (topk != null && !topk.isEmpty()) {
+            return topk.get(0).getProb();
+        }
+        return null;
+    }
+
+    /** Benign이면 false, 그 외는 true(가정) */
+    public boolean isRansomware() {
+        String topFamily = getTopFamily();
+        if (topFamily == null || topFamily.isBlank()) return false;
+        return !"Benign".equalsIgnoreCase(topFamily.trim());
+    }
 }

@@ -1,6 +1,20 @@
+/**
+ * 파일 이름 : MainLayout.jsx
+ * 기능 : 메인 레이아웃 컴포넌트. 헤더, 사이드바, 메인 콘텐츠 영역을 구성한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React from 'react';
 import NavSidebar from '../components/common/NavSidebar';
 
+/**
+ * 함수 이름 : MainLayout
+ * 기능 : 메인 레이아웃 컴포넌트.
+ * 매개변수 : children - 자식 컴포넌트
+ * 반환값 : JSX.Element - 메인 레이아웃 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function MainLayout({ children }) {
   return (
     <div className="app-root">

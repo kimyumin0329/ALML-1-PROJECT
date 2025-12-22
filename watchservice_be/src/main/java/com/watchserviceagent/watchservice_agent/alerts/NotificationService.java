@@ -1,11 +1,9 @@
 package com.watchserviceagent.watchservice_agent.alerts;
 
-import com.watchserviceagent.watchservice_agent.alerts.dto.AlertPageResponse;
-import com.watchserviceagent.watchservice_agent.alerts.dto.AlertStatsResponse;
+import com.watchserviceagent.watchservice_agent.alerts.domain.Notification;
+import com.watchserviceagent.watchservice_agent.alerts.dto.NotificationPageResponse;
+import com.watchserviceagent.watchservice_agent.alerts.dto.NotificationResponse;
 import com.watchserviceagent.watchservice_agent.common.util.SessionIdManager;
-import com.watchserviceagent.watchservice_agent.storage.LogRepository;
-import com.watchserviceagent.watchservice_agent.storage.domain.Log;
-import com.watchserviceagent.watchservice_agent.storage.dto.LogResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,32 +15,35 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 /**
- * 클래스 이름 : AlertService
- * 기능 : 알림(위험 이벤트) 조회 및 통계를 처리하는 비즈니스 로직을 제공한다.
+ * 클래스 이름 : NotificationService
+ * 기능 : 알림(윈도우 단위 AI 분석 결과) 조회 및 통계를 처리하는 비즈니스 로직을 제공한다.
  * 작성 날짜 : 2025/12/17
  * 작성자 : 시스템
  */
 @Service
 @RequiredArgsConstructor
-public class AlertService {
+public class NotificationService {
 
     private final SessionIdManager sessionIdManager;
-    private final LogRepository logRepository;
+    private final NotificationRepository notificationRepository;
 
     private static final int MAX_PAGE_SIZE = 1000;
     private static final DateTimeFormatter DATE_TIME_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(ZoneId.systemDefault());
 
     /**
-     * 함수 이름 : getAlerts
+     * 함수 이름 : getNotifications
      * 기능 : 페이지네이션, 필터링, 정렬을 지원하는 알림 목록을 조회한다.
      * 매개변수 : page - 페이지 번호, size - 페이지 크기, from - 시작 날짜, to - 종료 날짜, level - 위험도 필터, keyword - 검색 키워드, sort - 정렬 기준
-     * 반환값 : AlertPageResponse - 페이지네이션된 알림 목록
+     * 반환값 : NotificationPageResponse - 페이지네이션된 알림 목록
      * 작성 날짜 : 2025/12/17
      * 작성자 : 시스템
      */
-    public AlertPageResponse getAlerts(
+    public NotificationPageResponse getNotifications(
             Integer page,
             Integer size,
             String from,
@@ -61,20 +62,21 @@ public class AlertService {
 
         String ownerKey = sessionIdManager.getSessionId();
 
-        // level 정규화: ALL/빈값 => null 처리
         String lv = normalizeLevel(level);
 
-        long total = logRepository.countAlertsByOwner(ownerKey, fromEpoch, toEpoch, keyword, lv);
+        long total = notificationRepository.countNotificationsByOwner(ownerKey, fromEpoch, toEpoch, keyword, lv);
 
         int offset = (p - 1) * s;
-        List<Log> logs = logRepository.findAlertsByOwner(
+        List<Notification> notifications = notificationRepository.findNotificationsByOwner(
                 ownerKey, fromEpoch, toEpoch, keyword, lv,
                 si.field, si.dir, offset, s
         );
 
-        List<LogResponse> items = logs.stream().map(LogResponse::from).toList();
+        List<NotificationResponse> items = notifications.stream()
+                .map(this::toNotificationResponse)
+                .collect(Collectors.toList());
 
-        return AlertPageResponse.builder()
+        return NotificationPageResponse.builder()
                 .items(items)
                 .total(total)
                 .page(p)
@@ -83,53 +85,45 @@ public class AlertService {
     }
 
     /**
-     * 함수 이름 : getAlertById
+     * 함수 이름 : getNotificationById
      * 기능 : ID로 단일 알림의 상세 정보를 조회한다.
      * 매개변수 : id - 알림 ID
-     * 반환값 : LogResponse - 알림 상세 정보
+     * 반환값 : NotificationResponse - 알림 상세 정보
      * 예외 : NoSuchElementException - 알림을 찾을 수 없을 때
      * 작성 날짜 : 2025/12/17
      * 작성자 : 시스템
      */
-    public LogResponse getAlertById(long id) {
+    public NotificationResponse getNotificationById(long id) {
         String ownerKey = sessionIdManager.getSessionId();
-        Log logEntity = logRepository.findAlertByIdAndOwner(ownerKey, id)
-                .orElseThrow(() -> new NoSuchElementException("alert not found: id=" + id));
-        return LogResponse.from(logEntity);
+        Notification notification = notificationRepository.findByIdAndOwner(ownerKey, id)
+                .orElseThrow(() -> new NoSuchElementException("notification not found: id=" + id));
+        return toNotificationResponse(notification);
     }
 
     /**
-     * 함수 이름 : getStats
-     * 기능 : 알림 통계를 일별 또는 주별로 조회한다.
-     * 매개변수 : range - 통계 범위 (daily|weekly), from - 시작 날짜, to - 종료 날짜
-     * 반환값 : AlertStatsResponse - 알림 통계 데이터
+     * 함수 이름 : saveNotification
+     * 기능 : 윈도우 단위 AI 분석 결과를 알림으로 저장한다.
+     * 매개변수 : notification - 저장할 알림 엔티티
+     * 반환값 : 없음
      * 작성 날짜 : 2025/12/17
      * 작성자 : 시스템
      */
-    public AlertStatsResponse getStats(String range, String from, String to) {
-        String rg = (range == null) ? "daily" : range.trim().toLowerCase(Locale.ROOT);
-        if (!rg.equals("daily") && !rg.equals("weekly")) rg = "daily";
+    public void saveNotification(Notification notification) {
+        notificationRepository.insertNotification(notification);
+    }
 
-        Long fromEpoch = parseFromToEpochStart(from);
-        Long toEpoch = parseFromToEpochEnd(to);
-
-        String ownerKey = sessionIdManager.getSessionId();
-
-        var rows = logRepository.getAlertStats(ownerKey, fromEpoch, toEpoch, rg);
-
-        var series = rows.stream()
-                .map(r -> AlertStatsResponse.SeriesPoint.builder()
-                        .date(r.bucket())
-                        .warning((int) r.warning())
-                        .danger((int) r.danger())
-                        .build())
-                .toList();
-
-        return AlertStatsResponse.builder()
-                .range(rg)
-                .from(from)
-                .to(to)
-                .series(series)
+    private NotificationResponse toNotificationResponse(Notification notification) {
+        return NotificationResponse.builder()
+                .id(notification.getId())
+                .windowStart(DATE_TIME_FORMATTER.format(notification.getWindowStart()))
+                .windowEnd(DATE_TIME_FORMATTER.format(notification.getWindowEnd()))
+                .createdAt(DATE_TIME_FORMATTER.format(notification.getCreatedAt()))
+                .aiLabel(notification.getAiLabel())
+                .aiScore(notification.getAiScore())
+                .topFamily(notification.getTopFamily())
+                .aiDetail(notification.getAiDetail())
+                .affectedFilesCount(notification.getAffectedFilesCount())
+                .affectedPaths(notification.getAffectedPaths())
                 .build();
     }
 
@@ -142,11 +136,11 @@ public class AlertService {
     }
 
     private SortInfo parseSort(String sort) {
-        if (sort == null || sort.isBlank()) return new SortInfo("collectedAt", "desc");
+        if (sort == null || sort.isBlank()) return new SortInfo("createdAt", "desc");
         String[] parts = sort.split(",");
-        String field = parts.length > 0 ? parts[0].trim() : "collectedAt";
+        String field = parts.length > 0 ? parts[0].trim() : "createdAt";
         String dir = parts.length > 1 ? parts[1].trim() : "desc";
-        if (field.isBlank()) field = "collectedAt";
+        if (field.isBlank()) field = "createdAt";
         if (dir.isBlank()) dir = "desc";
         return new SortInfo(field, dir);
     }
@@ -168,7 +162,6 @@ public class AlertService {
         if (to == null || to.isBlank()) return null;
         try {
             LocalDate d = LocalDate.parse(to.trim());
-            // inclusive end-of-day
             LocalDateTime end = d.atTime(23, 59, 59, 999_000_000);
             return end.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
         } catch (DateTimeParseException ignore) {}
@@ -185,3 +178,4 @@ public class AlertService {
         SortInfo(String field, String dir) { this.field = field; this.dir = dir; }
     }
 }
+

@@ -1,4 +1,9 @@
-// src/pages/logs/LogsPage.jsx
+/**
+ * 파일 이름 : LogsPage.jsx
+ * 기능 : 로그 관리 페이지. 로그 조회, 필터링, 삭제, 내보내기 기능을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useMemo, useState } from 'react';
 import { useLogs } from '../../hooks/UseLogs';
 import LogFilterBar from '../../components/logs/LogFilterBar';
@@ -6,6 +11,14 @@ import LogTable from '../../components/logs/LogTable';
 import LogDetailModal from '../../components/logs/LogDetailModal';
 import { deleteLog, deleteLogs, exportLogs, fetchLogDetail } from '../../api/LogsApi';
 
+/**
+ * 함수 이름 : downloadText
+ * 기능 : 텍스트 파일을 다운로드한다.
+ * 매개변수 : filename - 파일명, text - 다운로드할 텍스트, mime - MIME 타입
+ * 반환값 : 없음
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function downloadText(filename, text, mime = 'text/plain;charset=utf-8') {
   const blob = new Blob([text], { type: mime });
   const url = URL.createObjectURL(blob);
@@ -16,11 +29,27 @@ function downloadText(filename, text, mime = 'text/plain;charset=utf-8') {
   URL.revokeObjectURL(url);
 }
 
+/**
+ * 함수 이름 : downloadJson
+ * 기능 : JSON 파일을 다운로드한다.
+ * 매개변수 : filename - 파일명, obj - 다운로드할 객체
+ * 반환값 : 없음
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function downloadJson(filename, obj) {
   const text = JSON.stringify(obj, null, 2);
   downloadText(filename, text, 'application/json;charset=utf-8');
 }
 
+/**
+ * 함수 이름 : LogsPage
+ * 기능 : 로그 관리 페이지 컴포넌트. 로그 조회, 필터링, 삭제, 내보내기 기능을 제공한다.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 로그 관리 페이지 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function LogsPage() {
   const {
     logs,
@@ -211,7 +240,12 @@ function LogsPage() {
 
   return (
     <div className="page-container">
-      <h1>로그 관리</h1>
+      <div>
+        <h1>로그 관리</h1>
+        <p style={{ fontSize: 13, color: '#9ca3af', marginTop: 4, marginBottom: 8 }}>
+          감시 기능이 수집한 원시 파일 이벤트와, 그로 인해 파일 크기/엔트로피/확장자가 어떻게 바뀌었는지(AI 분석 전 단계)를 시간순으로 보여줍니다.
+        </p>
+      </div>
 
       <div style={{ display: 'flex', gap: 12, alignItems: 'center', marginBottom: 12, flexWrap: 'wrap' }}>
         <label>

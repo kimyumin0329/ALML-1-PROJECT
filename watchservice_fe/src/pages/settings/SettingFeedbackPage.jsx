@@ -1,7 +1,20 @@
-// src/pages/settings/SettingFeedbackPage.jsx
+/**
+ * 파일 이름 : SettingFeedbackPage.jsx
+ * 기능 : 문의/피드백 제출 페이지. 버그 제보나 문의 내용을 전송할 수 있다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useState } from 'react';
 import { sendFeedback } from '../../api/SettingApi';
 
+/**
+ * 함수 이름 : SettingFeedbackPage
+ * 기능 : 피드백 제출 페이지 컴포넌트.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 피드백 제출 페이지 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function SettingFeedbackPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');

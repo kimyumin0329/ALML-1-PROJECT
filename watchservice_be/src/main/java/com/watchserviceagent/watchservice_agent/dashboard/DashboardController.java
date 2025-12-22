@@ -12,6 +12,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 클래스 이름 : DashboardController
+ * 기능 : 대시보드 요약 정보를 제공하는 REST API 엔드포인트를 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 @RestController
 @RequestMapping("/dashboard")
 @RequiredArgsConstructor
@@ -22,6 +28,14 @@ public class DashboardController {
     private final AlertService alertService;
     private final SettingsService settingsService;
 
+    /**
+     * 함수 이름 : getSummary
+     * 기능 : 대시보드 요약 정보를 조회한다. 최근 알림, 위험도 상태, 감시 폴더 경로 등을 포함한다.
+     * 매개변수 : 없음
+     * 반환값 : DashboardSummaryResponse - 대시보드 요약 정보
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     @GetMapping("/summary")
     public DashboardSummaryResponse getSummary() {
         // 최근 알림(= ai_label 있는 로그) 50개 기준

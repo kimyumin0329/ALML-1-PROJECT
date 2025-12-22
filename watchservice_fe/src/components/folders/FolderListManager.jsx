@@ -1,6 +1,19 @@
-// src/components/folders/FolderListManager.jsx
+/**
+ * 파일 이름 : FolderListManager.jsx
+ * 기능 : 폴더 목록 관리 컴포넌트. 감시 대상 폴더 목록을 표시하고 추가/삭제 기능을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React from 'react';
 
+/**
+ * 함수 이름 : FolderListManager
+ * 기능 : 폴더 목록 관리 컴포넌트.
+ * 매개변수 : folders - 폴더 배열, onAddFolder - 폴더 추가 핸들러, onRemoveFolder - 폴더 삭제 핸들러
+ * 반환값 : JSX.Element - 폴더 목록 관리 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function FolderListManager({ folders, onAddFolder, onRemoveFolder }) {
   return (
     <div className="folder-panel">

@@ -8,18 +8,16 @@ import lombok.ToString;
 /**
  * AI 서버로 전송할 3초 윈도우 피처 벡터.
  *
- * JSON 전송 시에는 학습 CSV 헤더와 동일한 snake_case 키를 사용한다.
+ * 파일 감시 기반 9개 피처만 포함.
  */
 @Getter
 @Builder
 @ToString
 public class AiPayload {
 
-    // 윈도우 동안 발생한 모든 MODIFY 이벤트 개수
     @JsonProperty("file_read_count")
     private int fileReadCount;
 
-    // MODIFY 중 실제 내용이 바뀐 이벤트 개수
     @JsonProperty("file_write_count")
     private int fileWriteCount;
 

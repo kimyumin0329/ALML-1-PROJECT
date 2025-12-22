@@ -1,7 +1,19 @@
-// src/pages/settings/SettingUpdatePage.jsx
-
+/**
+ * 파일 이름 : SettingUpdatePage.jsx
+ * 기능 : 버전/업데이트 정보 페이지. 현재 버전을 표시하고 향후 업데이트 확인 기능을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React from 'react';
 
+/**
+ * 함수 이름 : SettingUpdatePage
+ * 기능 : 버전/업데이트 정보 페이지 컴포넌트.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 버전/업데이트 정보 페이지 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function SettingUpdatePage() {
   const currentVersion = '0.1.0-dev';
 

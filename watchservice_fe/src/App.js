@@ -1,26 +1,36 @@
+/**
+ * 파일 이름 : App.js
+ * 기능 : 애플리케이션의 루트 컴포넌트. 라우팅 설정과 전체 레이아웃을 관리한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from './layout/MainLayout';
 import MainBoardPage from './pages/mainboard/MainBoardPage';
 
-// 알림 관련 페이지
 import NotificationPage from './pages/notifications/NotificationPage';
 import NotificationDetailPage from './pages/notifications/NotificationDetailPage';
 import NotificationStatsPage from './pages/notifications/NotificationStatsPage';
 
-// 로그 페이지
 import LogsPage from './pages/logs/LogsPage';
 
-// 설정 관련 페이지
 import SettingHomePage from './pages/settings/SettingHomePage';
 import SettingFoldersPage from './pages/settings/SettingFoldersPage';
 import SettingNotifyPage from './pages/settings/SettingNotifyPage';
-
 import SettingExceptionsPage from './pages/settings/SettingExceptionsPage';
 import SettingResetPage from './pages/settings/SettingResetPage';
 import SettingUpdatePage from './pages/settings/SettingUpdatePage';
 import SettingFeedbackPage from './pages/settings/SettingFeedbackPage';
 
+/**
+ * 함수 이름 : App
+ * 기능 : 애플리케이션의 루트 컴포넌트. 모든 라우트를 정의하고 MainLayout으로 감싼다.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 애플리케이션 루트 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function App() {
   return (
     <BrowserRouter>

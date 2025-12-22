@@ -13,13 +13,10 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * Collector/Analytics → Storage 구간의 비동기 큐 역할을 하는 워커.
- *
- * - FileAnalysisResult 를 큐에 넣으면,
- * - 별도 워커 스레드가 이를 하나씩 꺼내어 SQLite 에 Log 로 INSERT 한다.
- *
- * 업데이트:
- *  - FileAnalysisResult 에 포함된 aiLabel / aiScore / aiDetail 도 함께 저장한다.
+ * 클래스 이름 : LogWriterWorker
+ * 기능 : Collector/Analytics에서 생성된 FileAnalysisResult를 비동기로 큐에 넣어 SQLite에 저장하는 워커 스레드를 관리한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
  */
 @Slf4j
 @Component
@@ -33,6 +30,14 @@ public class LogWriterWorker {
     private Thread workerThread;
     private volatile boolean running = true;
 
+    /**
+     * 함수 이름 : start
+     * 기능 : 워커 스레드를 시작한다. 애플리케이션 시작 시 자동 호출된다.
+     * 매개변수 : 없음
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     @PostConstruct
     public void start() {
         workerThread = new Thread(this::runWorker, "LogWriterWorker-Thread");
@@ -40,6 +45,14 @@ public class LogWriterWorker {
         log.info("[LogWriterWorker] 워커 스레드 시작");
     }
 
+    /**
+     * 함수 이름 : stop
+     * 기능 : 워커 스레드를 중지하고 리소스를 정리한다. 애플리케이션 종료 시 자동 호출된다.
+     * 매개변수 : 없음
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     @PreDestroy
     public void stop() {
         running = false;
@@ -56,7 +69,12 @@ public class LogWriterWorker {
     }
 
     /**
-     * FileAnalysisResult 를 큐에 넣는 진입점.
+     * 함수 이름 : enqueue
+     * 기능 : FileAnalysisResult를 비동기 저장 큐에 추가한다.
+     * 매개변수 : result - 저장할 파일 분석 결과
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     public void enqueue(FileAnalysisResult result) {
         if (result == null) return;
@@ -68,6 +86,14 @@ public class LogWriterWorker {
         }
     }
 
+    /**
+     * 함수 이름 : runWorker
+     * 기능 : 워커 스레드의 메인 루프. 큐에서 FileAnalysisResult를 꺼내어 DB에 저장한다.
+     * 매개변수 : 없음
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     private void runWorker() {
         while (running && !Thread.currentThread().isInterrupted()) {
             try {
@@ -85,8 +111,12 @@ public class LogWriterWorker {
     }
 
     /**
-     * FileAnalysisResult → Log 엔티티 매핑.
-     * (AI 결과 포함)
+     * 함수 이름 : mapToLog
+     * 기능 : FileAnalysisResult를 Log 엔티티로 변환한다. AI 분석 결과도 포함한다.
+     * 매개변수 : r - 파일 분석 결과
+     * 반환값 : Log - 로그 엔티티
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     private Log mapToLog(FileAnalysisResult r) {
         Instant collectedAt = r.getEventTime();
@@ -97,6 +127,10 @@ public class LogWriterWorker {
         Long sizeAfter = r.getSizeAfter();
         Double entropyAfter = r.getEntropyAfter();
         boolean existsAfter = r.isExistsAfter();
+        Long sizeBefore = r.getSizeBefore();
+        Double entropyBefore = r.getEntropyBefore();
+        Long sizeDiff = r.getSizeDiff();
+        Double entropyDiff = r.getEntropyDiff();
 
         long sizeForLog = (sizeAfter != null) ? sizeAfter : -1L;
         long lastModifiedForLog = collectedAt.toEpochMilli();
@@ -108,6 +142,15 @@ public class LogWriterWorker {
                 .path(r.getPath())
                 .exists(existsAfter)
                 .size(sizeForLog)
+                .sizeBefore(sizeBefore)
+                .sizeAfter(sizeAfter)
+                .entropyBefore(entropyBefore)
+                .entropyAfter(entropyAfter)
+                .extBefore(r.getExtBefore())
+                .extAfter(r.getExtAfter())
+                .existsBefore(r.isExistsBefore())
+                .sizeDiff(sizeDiff)
+                .entropyDiff(entropyDiff)
                 .lastModifiedTime(lastModifiedForLog)
                 .hash(null)              // hash 는 아직 미사용
                 .entropy(entropyAfter)

@@ -1,7 +1,20 @@
-// src/components/notifications/NotificationList.jsx
+/**
+ * 파일 이름 : NotificationList.jsx
+ * 기능 : 알림 목록 컴포넌트. 알림 항목들을 리스트로 표시한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React from 'react';
 import NotificationItem from './NotificationItem';
 
+/**
+ * 함수 이름 : NotificationList
+ * 기능 : 알림 목록 컴포넌트.
+ * 매개변수 : items - 알림 배열, loading - 로딩 상태, error - 에러 객체, emptyText - 빈 목록 메시지, onItemClick - 항목 클릭 핸들러
+ * 반환값 : JSX.Element - 알림 목록 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 export default function NotificationList({
   items = [],
   loading = false,

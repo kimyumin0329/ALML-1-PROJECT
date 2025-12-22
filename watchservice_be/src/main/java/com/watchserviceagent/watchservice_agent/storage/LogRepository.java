@@ -1,4 +1,3 @@
-// src/main/java/com/watchserviceagent/watchservice_agent/storage/LogRepository.java
 package com.watchserviceagent.watchservice_agent.storage;
 
 import com.watchserviceagent.watchservice_agent.storage.domain.Log;
@@ -14,6 +13,12 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.util.*;
 
+/**
+ * 클래스 이름 : LogRepository
+ * 기능 : SQLite 데이터베이스에 로그를 저장하고 조회하는 데이터 접근 계층을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 @Repository
 @RequiredArgsConstructor
 @Slf4j
@@ -21,6 +26,14 @@ public class LogRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * 함수 이름 : init
+     * 기능 : 로그 테이블을 생성하고 필요한 컬럼을 추가한다. 애플리케이션 시작 시 자동 호출된다.
+     * 매개변수 : 없음
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     @PostConstruct
     public void init() {
         String sql = """
@@ -31,6 +44,15 @@ public class LogRepository {
                     path               TEXT NOT NULL,
                     exists_flag        INTEGER NOT NULL,
                     size               INTEGER NOT NULL,
+                    size_before        INTEGER,
+                    size_after         INTEGER,
+                    entropy_before     REAL,
+                    entropy_after      REAL,
+                    ext_before         TEXT,
+                    ext_after          TEXT,
+                    exists_before      INTEGER,
+                    size_diff          INTEGER,
+                    entropy_diff       REAL,
                     last_modified_time INTEGER NOT NULL,
                     hash               TEXT,
                     entropy            REAL,
@@ -41,9 +63,44 @@ public class LogRepository {
                 );
                 """;
         jdbcTemplate.execute(sql);
+        // 기존 테이블에 신규 컬럼 없을 수 있으므로 추가 시도(이미 있으면 무시)
+        tryAddColumn("size_before", "INTEGER");
+        tryAddColumn("size_after", "INTEGER");
+        tryAddColumn("entropy_before", "REAL");
+        tryAddColumn("entropy_after", "REAL");
+        tryAddColumn("ext_before", "TEXT");
+        tryAddColumn("ext_after", "TEXT");
+        tryAddColumn("exists_before", "INTEGER");
+        tryAddColumn("size_diff", "INTEGER");
+        tryAddColumn("entropy_diff", "REAL");
         log.info("[LogRepository] log 테이블 초기화 완료");
     }
 
+    /**
+     * 함수 이름 : tryAddColumn
+     * 기능 : 기존 테이블에 컬럼을 추가하려고 시도한다. 이미 존재하면 무시한다.
+     * 매개변수 : column - 컬럼 이름, type - 컬럼 타입
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
+    private void tryAddColumn(String column, String type) {
+        try {
+            jdbcTemplate.execute("ALTER TABLE log ADD COLUMN " + column + " " + type);
+            log.info("[LogRepository] 컬럼 추가: {}", column);
+        } catch (Exception ignore) {
+            // 이미 존재하는 경우 등은 무시
+        }
+    }
+
+    /**
+     * 함수 이름 : insertLog
+     * 기능 : 로그 엔티티를 데이터베이스에 삽입한다.
+     * 매개변수 : logEntity - 저장할 로그 엔티티
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public void insertLog(Log logEntity) {
         String sql = """
                 INSERT INTO log (
@@ -52,6 +109,15 @@ public class LogRepository {
                     path,
                     exists_flag,
                     size,
+                    size_before,
+                    size_after,
+                    entropy_before,
+                    entropy_after,
+                    ext_before,
+                    ext_after,
+                    exists_before,
+                    size_diff,
+                    entropy_diff,
                     last_modified_time,
                     hash,
                     entropy,
@@ -59,7 +125,7 @@ public class LogRepository {
                     ai_score,
                     ai_detail,
                     collected_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         jdbcTemplate.update(
@@ -69,6 +135,15 @@ public class LogRepository {
                 logEntity.getPath(),
                 logEntity.isExists() ? 1 : 0,
                 logEntity.getSize(),
+                logEntity.getSizeBefore(),
+                logEntity.getSizeAfter(),
+                logEntity.getEntropyBefore(),
+                logEntity.getEntropyAfter(),
+                logEntity.getExtBefore(),
+                logEntity.getExtAfter(),
+                logEntity.getExistsBefore() == null ? null : (logEntity.getExistsBefore() ? 1 : 0),
+                logEntity.getSizeDiff(),
+                logEntity.getEntropyDiff(),
                 logEntity.getLastModifiedTime(),
                 logEntity.getHash(),
                 logEntity.getEntropy(),
@@ -82,8 +157,10 @@ public class LogRepository {
     public List<Log> findRecentLogsByOwner(String ownerKey, int limit) {
         String sql = """
                 SELECT
-                    id, owner_key, event_type, path, exists_flag, size, last_modified_time,
-                    hash, entropy, ai_label, ai_score, ai_detail, collected_at
+                    id, owner_key, event_type, path, exists_flag, size,
+                    size_before, size_after, entropy_before, entropy_after,
+                    ext_before, ext_after, exists_before, size_diff, entropy_diff,
+                    last_modified_time, hash, entropy, ai_label, ai_score, ai_detail, collected_at
                 FROM log
                 WHERE owner_key = ?
                 ORDER BY collected_at DESC, id DESC
@@ -95,8 +172,10 @@ public class LogRepository {
     public Optional<Log> findByIdAndOwner(String ownerKey, long id) {
         String sql = """
                 SELECT
-                    id, owner_key, event_type, path, exists_flag, size, last_modified_time,
-                    hash, entropy, ai_label, ai_score, ai_detail, collected_at
+                    id, owner_key, event_type, path, exists_flag, size,
+                    size_before, size_after, entropy_before, entropy_after,
+                    ext_before, ext_after, exists_before, size_diff, entropy_diff,
+                    last_modified_time, hash, entropy, ai_label, ai_score, ai_detail, collected_at
                 FROM log
                 WHERE owner_key = ? AND id = ?
                 LIMIT 1
@@ -135,8 +214,10 @@ public class LogRepository {
 
         StringBuilder sb = new StringBuilder("""
                 SELECT
-                    id, owner_key, event_type, path, exists_flag, size, last_modified_time,
-                    hash, entropy, ai_label, ai_score, ai_detail, collected_at
+                    id, owner_key, event_type, path, exists_flag, size,
+                    size_before, size_after, entropy_before, entropy_after,
+                    ext_before, ext_after, exists_before, size_diff, entropy_diff,
+                    last_modified_time, hash, entropy, ai_label, ai_score, ai_detail, collected_at
                 FROM log
                 WHERE owner_key = ? AND id IN (
                 """);
@@ -184,8 +265,10 @@ public class LogRepository {
 
         String sql = """
                 SELECT
-                    id, owner_key, event_type, path, exists_flag, size, last_modified_time,
-                    hash, entropy, ai_label, ai_score, ai_detail, collected_at
+                    id, owner_key, event_type, path, exists_flag, size,
+                    size_before, size_after, entropy_before, entropy_after,
+                    ext_before, ext_after, exists_before, size_diff, entropy_diff,
+                    last_modified_time, hash, entropy, ai_label, ai_score, ai_detail, collected_at
                 FROM log
                 """ + sp.whereClause + " " + orderBy + " LIMIT ? OFFSET ?";
 
@@ -261,6 +344,28 @@ public class LogRepository {
         return new RowMapper<>() {
             @Override
             public Log mapRow(ResultSet rs, int rowNum) throws SQLException {
+                // SQLite는 INTEGER/REAL 컬럼을 Integer, Long, Double 등으로 돌려줄 수 있으므로
+                // Number 기반으로 안전하게 캐스팅한다.
+                Number sizeBeforeNum = (Number) rs.getObject("size_before");
+                Number sizeAfterNum = (Number) rs.getObject("size_after");
+                Number sizeDiffNum = (Number) rs.getObject("size_diff");
+                Number entropyBeforeNum = (Number) rs.getObject("entropy_before");
+                Number entropyAfterNum = (Number) rs.getObject("entropy_after");
+                Number entropyDiffNum = (Number) rs.getObject("entropy_diff");
+
+                Long sizeBefore = sizeBeforeNum == null ? null : sizeBeforeNum.longValue();
+                Long sizeAfter = sizeAfterNum == null ? null : sizeAfterNum.longValue();
+                Long sizeDiff = sizeDiffNum == null ? null : sizeDiffNum.longValue();
+                Double entropyBefore = entropyBeforeNum == null ? null : entropyBeforeNum.doubleValue();
+                Double entropyAfter = entropyAfterNum == null ? null : entropyAfterNum.doubleValue();
+                Double entropyDiff = entropyDiffNum == null ? null : entropyDiffNum.doubleValue();
+
+                String extBefore = rs.getString("ext_before");
+                String extAfter = rs.getString("ext_after");
+                Boolean existsBefore = rs.getObject("exists_before") == null
+                        ? null
+                        : rs.getInt("exists_before") != 0;
+
                 return Log.builder()
                         .id(rs.getLong("id"))
                         .ownerKey(rs.getString("owner_key"))
@@ -268,6 +373,15 @@ public class LogRepository {
                         .path(rs.getString("path"))
                         .exists(rs.getInt("exists_flag") != 0)
                         .size(rs.getLong("size"))
+                        .sizeBefore(sizeBefore)
+                        .sizeAfter(sizeAfter)
+                        .entropyBefore(entropyBefore)
+                        .entropyAfter(entropyAfter)
+                        .extBefore(extBefore)
+                        .extAfter(extAfter)
+                        .existsBefore(existsBefore)
+                        .sizeDiff(sizeDiff)
+                        .entropyDiff(entropyDiff)
                         .lastModifiedTime(rs.getLong("last_modified_time"))
                         .hash(rs.getString("hash"))
                         .entropy(rs.getObject("entropy") != null ? rs.getDouble("entropy") : null)
@@ -328,8 +442,10 @@ public class LogRepository {
 
         String sql = """
             SELECT
-                id, owner_key, event_type, path, exists_flag, size, last_modified_time,
-                hash, entropy, ai_label, ai_score, ai_detail, collected_at
+                id, owner_key, event_type, path, exists_flag, size,
+                size_before, size_after, entropy_before, entropy_after,
+                ext_before, ext_after, exists_before, size_diff, entropy_diff,
+                last_modified_time, hash, entropy, ai_label, ai_score, ai_detail, collected_at
             FROM log
             """ + sp.whereClause + " " + orderBy + " LIMIT ? OFFSET ?";
 
@@ -346,8 +462,10 @@ public class LogRepository {
     public Optional<Log> findAlertByIdAndOwner(String ownerKey, long id) {
         String sql = """
             SELECT
-                id, owner_key, event_type, path, exists_flag, size, last_modified_time,
-                hash, entropy, ai_label, ai_score, ai_detail, collected_at
+                id, owner_key, event_type, path, exists_flag, size,
+                size_before, size_after, entropy_before, entropy_after,
+                ext_before, ext_after, exists_before, size_diff, entropy_diff,
+                last_modified_time, hash, entropy, ai_label, ai_score, ai_detail, collected_at
             FROM log
             WHERE owner_key = ?
               AND id = ?

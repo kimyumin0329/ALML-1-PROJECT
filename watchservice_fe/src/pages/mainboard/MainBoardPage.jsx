@@ -1,4 +1,9 @@
-// src/pages/mainboard/MainBoardPage.jsx
+/**
+ * 파일 이름 : MainBoardPage.jsx
+ * 기능 : 메인 대시보드 페이지. 보호 상태, 감시/검사 제어, 감시 폴더 관리, 최근 이벤트를 표시한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { startWatcher, stopWatcher } from '../../api/WatcherApi';
 import { useWatchedFolders } from '../../hooks/UseWatchedFolders';
@@ -10,29 +15,45 @@ import ProtectionStatusBadge from '../../components/protection/ProtectionStatusB
 import ScanControlPanel from '../../components/protection/ScanControlPanel';
 import RecentEventsPanel from '../../components/protection/RecentEventsPanel';
 
+/**
+ * 함수 이름 : MainBoardPage
+ * 기능 : 메인 대시보드 페이지 컴포넌트. 보호 상태, 감시/검사 제어, 폴더 관리, 최근 이벤트를 통합적으로 표시한다.
+ * 매개변수 : 없음
+ * 반환값 : JSX.Element - 메인 대시보드 페이지 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function MainBoardPage() {
-  // 대시보드 요약
+  /** 대시보드 요약 상태 */
   const [protectionStatus, setProtectionStatus] = useState('안전');
   const [statusCode, setStatusCode] = useState('SAFE');
   const [lastEventTime, setLastEventTime] = useState('N/A');
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState(null);
 
-  // 감시/검사 상태
+  /** 감시/검사 상태 */
   const [isWatching, setIsWatching] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
   const [scanId, setScanId] = useState(null);
 
+  /** 스캔 진행률 폴링을 위한 ref */
   const pollRef = useRef(null);
 
-  // 폴더
+  /** 감시 폴더 훅 */
   const { folders, promptAndAddFolder, removeFolder } = useWatchedFolders();
 
-  // 최근 이벤트(5건)
+  /** 최근 이벤트 훅 (5건) */
   const { logs: recentLogs, loading: logsLoading, error: logsError } = useLogs(5);
 
-  // 요약 불러오기
+  /**
+   * 함수 이름 : useEffect (요약 불러오기)
+   * 기능 : 컴포넌트 마운트 시 대시보드 요약 정보를 불러온다.
+   * 매개변수 : 없음
+   * 반환값 : 없음
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   useEffect(() => {
     const loadSummary = async () => {
       try {
@@ -56,7 +77,14 @@ function MainBoardPage() {
     loadSummary();
   }, []);
 
-  // 로그 -> 최근 이벤트 가공
+  /**
+   * 함수 이름 : recentEvents (useMemo)
+   * 기능 : 로그 데이터를 최근 이벤트 뷰 형태로 변환한다.
+   * 매개변수 : 없음
+   * 반환값 : Array - 변환된 이벤트 배열
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   const recentEvents = useMemo(() => {
     const mapLogToEventView = (log) => {
       let level = 'info';
@@ -80,7 +108,14 @@ function MainBoardPage() {
     return Array.isArray(recentLogs) ? recentLogs.map(mapLogToEventView) : [];
   }, [recentLogs]);
 
-  // 감시 시작/중지
+  /**
+   * 함수 이름 : handleToggleWatch
+   * 기능 : 파일 감시를 시작하거나 중지한다.
+   * 매개변수 : 없음
+   * 반환값 : 없음
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   const handleToggleWatch = async () => {
     const target = folders[0];
 
@@ -108,7 +143,14 @@ function MainBoardPage() {
     }
   };
 
-  // 즉시 검사
+  /**
+   * 함수 이름 : handleScanNow
+   * 기능 : 즉시 검사를 시작한다. 검사 완료 후 자동으로 감시를 시작한다.
+   * 매개변수 : 없음
+   * 반환값 : 없음
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   const handleScanNow = async () => {
     const paths = folders.map((f) => f.path).filter(Boolean);
     if (paths.length === 0) {
@@ -151,7 +193,14 @@ function MainBoardPage() {
     }
   };
 
-  // 검사 중지(=pause endpoint지만 실질 stop)
+  /**
+   * 함수 이름 : handlePause
+   * 기능 : 검사를 일시 중지하거나 감시를 중지한다.
+   * 매개변수 : 없음
+   * 반환값 : 없음
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   const handlePause = async () => {
     try {
       if (scanId) {
@@ -178,7 +227,14 @@ function MainBoardPage() {
     }
   };
 
-  // scan progress polling (scanId 있을 때만)
+  /**
+   * 함수 이름 : useEffect (스캔 진행률 폴링)
+   * 기능 : scanId가 있을 때 주기적으로 스캔 진행률을 조회한다.
+   * 매개변수 : 없음
+   * 반환값 : 없음
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   useEffect(() => {
     if (!scanId) return;
 
@@ -227,8 +283,24 @@ function MainBoardPage() {
     };
   }, [scanId]);
 
-  // 폴더 추가/삭제
+  /**
+   * 함수 이름 : handleAddFolder
+   * 기능 : 폴더 추가 다이얼로그를 표시한다.
+   * 매개변수 : 없음
+   * 반환값 : 없음
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   const handleAddFolder = () => promptAndAddFolder();
+
+  /**
+   * 함수 이름 : handleRemoveFolder
+   * 기능 : 지정된 ID의 폴더를 삭제한다.
+   * 매개변수 : id - 삭제할 폴더 ID
+   * 반환값 : 없음
+   * 작성 날짜 : 2025/12/17
+   * 작성자 : 시스템
+   */
   const handleRemoveFolder = (id) => removeFolder(id);
 
   return (

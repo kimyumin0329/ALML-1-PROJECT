@@ -8,10 +8,10 @@ import lombok.ToString;
 import java.time.Instant;
 
 /**
- * "이 파일에 대해 이 이벤트 1번이 발생했을 때,
- *  이전 상태 vs 현재 상태를 비교한 결과 한 건"을 나타내는 DTO.
- *
- * Collector → Analytics/EventWindowAggregator → Storage/LogWriterWorker 에서 공통 사용.
+ * 클래스 이름 : FileAnalysisResult
+ * 기능 : 파일 이벤트 1건에 대한 분석 결과를 담는 DTO. 이전 상태와 현재 상태를 비교한 결과를 포함한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
  */
 @Getter
 @Builder
@@ -59,7 +59,14 @@ public class FileAnalysisResult {
 
     // ===== 편의 메서드 =====
 
-    // 엔트로피 변화량 (after - before)
+    /**
+     * 함수 이름 : getEntropyDiff
+     * 기능 : 엔트로피 변화량을 계산한다 (after - before).
+     * 매개변수 : 없음
+     * 반환값 : Double - 엔트로피 변화량, 계산 불가능하면 null
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public Double getEntropyDiff() {
         if (entropyBefore == null || entropyAfter == null) {
             return null;
@@ -67,7 +74,14 @@ public class FileAnalysisResult {
         return entropyAfter - entropyBefore;
     }
 
-    // 크기 변화량 (after - before)
+    /**
+     * 함수 이름 : getSizeDiff
+     * 기능 : 파일 크기 변화량을 계산한다 (after - before).
+     * 매개변수 : 없음
+     * 반환값 : Long - 크기 변화량, 계산 불가능하면 null
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public Long getSizeDiff() {
         if (sizeBefore == null || sizeAfter == null) {
             return null;
@@ -76,9 +90,12 @@ public class FileAnalysisResult {
     }
 
     /**
-     * 윈도우 단위로 계산된 AiResult 를 이 이벤트에 붙인 새로운 FileAnalysisResult 를 만든다.
-     *
-     * 원본은 그대로 두고, AI 필드만 채워진 새 인스턴스를 반환.
+     * 함수 이름 : withAiResult
+     * 기능 : 윈도우 단위로 계산된 AiResult를 이 이벤트에 붙인 새로운 FileAnalysisResult를 생성한다. 원본은 그대로 두고 AI 필드만 채워진 새 인스턴스를 반환한다.
+     * 매개변수 : aiResult - AI 분석 결과
+     * 반환값 : FileAnalysisResult - AI 결과가 포함된 새로운 인스턴스
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     public FileAnalysisResult withAiResult(AiResult aiResult) {
         if (aiResult == null) {

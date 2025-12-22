@@ -1,10 +1,32 @@
+/**
+ * 파일 이름 : NotificationStatusChart.jsx
+ * 기능 : 알림 상태 차트 컴포넌트. 위험도별 알림 통계를 막대 그래프로 표시한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useMemo } from 'react';
 
+/**
+ * 함수 이름 : safe
+ * 기능 : 숫자를 안전하게 변환한다. 유효하지 않은 값은 0을 반환한다.
+ * 매개변수 : n - 변환할 숫자
+ * 반환값 : number - 변환된 숫자
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function safe(n) {
   const v = Number(n || 0);
   return Number.isFinite(v) ? v : 0;
 }
 
+/**
+ * 함수 이름 : NotificationStatusChart
+ * 기능 : 알림 상태 차트 컴포넌트.
+ * 매개변수 : stats - 통계 객체 (total, DANGER, WARNING, SAFE, UNKNOWN)
+ * 반환값 : JSX.Element - 알림 상태 차트 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 export default function NotificationStatusChart({ stats }) {
   const data = useMemo(() => {
     const total = safe(stats?.total);

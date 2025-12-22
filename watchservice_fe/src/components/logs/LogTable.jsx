@@ -1,6 +1,19 @@
-// src/components/logs/LogTable.jsx
+/**
+ * 파일 이름 : LogTable.jsx
+ * 기능 : 로그 목록을 테이블 형태로 표시하는 컴포넌트. 체크박스 선택, 행 클릭 이벤트를 지원한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import React, { useMemo } from 'react';
 
+/**
+ * 함수 이름 : LogTable
+ * 기능 : 로그 목록을 테이블로 렌더링한다.
+ * 매개변수 : logs - 로그 리스트, onRowClick - 행 클릭 핸들러, selectedIds - 선택된 로그 ID Set, onToggleSelect - 개별 선택 토글 핸들러, onToggleSelectAll - 전체 선택 토글 핸들러
+ * 반환값 : JSX.Element - 로그 테이블 컴포넌트
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 function LogTable({ logs, onRowClick, selectedIds, onToggleSelect, onToggleSelectAll }) {
   const list = logs || [];
   const allSelected = useMemo(() => {
@@ -26,8 +39,9 @@ function LogTable({ logs, onRowClick, selectedIds, onToggleSelect, onToggleSelec
             <th>수집 시각</th>
             <th>이벤트</th>
             <th>경로</th>
-            <th>크기</th>
-            <th>AI</th>
+            <th>크기 변화</th>
+            <th>엔트로피 변화</th>
+            {/* <th>AI</th> */}
           </tr>
         </thead>
 
@@ -44,11 +58,18 @@ function LogTable({ logs, onRowClick, selectedIds, onToggleSelect, onToggleSelec
               <td>{log.id}</td>
               <td>{log.collectedAt}</td>
               <td>{log.eventType}</td>
-              <td title={log.path} style={{ maxWidth: 520, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <td title={log.path} style={{ maxWidth: 420, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {log.path}
               </td>
-              <td>{log.size}</td>
-              <td>{log.aiLabel || '-'}</td>
+              <td>
+                {log.sizeBefore != null ? `${log.sizeBefore} → ${log.sizeAfter ?? log.size}` : (log.size ?? '-')}
+                {log.sizeDiff != null ? ` (${log.sizeDiff >= 0 ? '+' : ''}${log.sizeDiff})` : ''}
+              </td>
+              <td>
+                {log.entropyBefore != null ? `${log.entropyBefore} → ${log.entropyAfter ?? log.entropy ?? '-'}` : (log.entropy ?? '-')}
+                {log.entropyDiff != null ? ` (${log.entropyDiff >= 0 ? '+' : ''}${log.entropyDiff.toFixed(4)})` : ''}
+              </td>
+              {/* <td>{log.aiLabel || '-'}</td> */}
             </tr>
           ))}
         </tbody>

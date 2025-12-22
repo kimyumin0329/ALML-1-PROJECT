@@ -27,3 +27,19 @@ ai:
     url: http://localhost:8001/api/analyze
   family:
     url: http://localhost:8001/predict
+
+watchservice:
+  analytics:
+    window-ms: 3000
+    touch-session-timeout-ms: 300000
+    rename-max-gap-ms: 2000
+
+    encrypt:
+      entropy-diff-threshold: 0.30
+      min-size-bytes: 4096
+      eps: 1.0e-6
+
+    random-ext:
+      min-count: 2
+      min-length: 4
+      whitelist: "txt,log,doc,docx,xls,xlsx,pdf,png,jpg,jpeg,gif,zip,rar,7z"

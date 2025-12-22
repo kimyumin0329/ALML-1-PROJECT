@@ -1,4 +1,3 @@
-// src/main/java/com/watchserviceagent/watchservice_agent/storage/LogService.java
 package com.watchserviceagent.watchservice_agent.storage;
 
 import com.watchserviceagent.watchservice_agent.collector.dto.FileAnalysisResult;
@@ -16,9 +15,14 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 클래스 이름 : LogService
+ * 기능 : 로그 저장, 조회, 삭제, 내보내기 등의 비즈니스 로직을 처리한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -32,17 +36,41 @@ public class LogService {
     private static final int EXPORT_LIMIT = 20000;
     private static final DateTimeFormatter DATE_TIME_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    /**
+     * 함수 이름 : saveAsync
+     * 기능 : 파일 분석 결과를 비동기로 로그 저장 큐에 추가한다.
+     * 매개변수 : result - 파일 분석 결과
+     * 반환값 : 없음
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public void saveAsync(FileAnalysisResult result) {
         if (result == null) return;
         logWriterWorker.enqueue(result);
     }
 
+    /**
+     * 함수 이름 : getRecentLogs
+     * 기능 : 최근 로그를 지정된 개수만큼 조회한다.
+     * 매개변수 : limit - 조회할 로그 개수
+     * 반환값 : LogResponse 리스트
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public List<LogResponse> getRecentLogs(int limit) {
         String ownerKey = sessionIdManager.getSessionId();
         List<Log> logs = logRepository.findRecentLogsByOwner(ownerKey, limit);
         return logs.stream().map(LogResponse::from).toList();
     }
 
+    /**
+     * 함수 이름 : getLogs
+     * 기능 : 페이지네이션, 필터링, 정렬을 지원하는 로그 목록을 조회한다.
+     * 매개변수 : page - 페이지 번호, size - 페이지 크기, from - 시작 날짜, to - 종료 날짜, keyword - 검색 키워드, aiLabel - AI 라벨 필터, eventType - 이벤트 타입 필터, sort - 정렬 기준
+     * 반환값 : LogPageResponse - 페이지네이션된 로그 목록
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public LogPageResponse getLogs(Integer page, Integer size, String from, String to,
                                    String keyword, String aiLabel, String eventType, String sort) {
 
@@ -81,6 +109,15 @@ public class LogService {
                 .build();
     }
 
+    /**
+     * 함수 이름 : getLogById
+     * 기능 : ID로 단일 로그를 조회한다.
+     * 매개변수 : id - 로그 ID
+     * 반환값 : LogResponse - 로그 상세 정보
+     * 예외 : IllegalArgumentException - 로그를 찾을 수 없을 때
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public LogResponse getLogById(long id) {
         String ownerKey = sessionIdManager.getSessionId();
         Log log = logRepository.findByIdAndOwner(ownerKey, id)
@@ -88,12 +125,29 @@ public class LogService {
         return LogResponse.from(log);
     }
 
+    /**
+     * 함수 이름 : deleteOne
+     * 기능 : 단일 로그를 삭제한다.
+     * 매개변수 : id - 삭제할 로그 ID
+     * 반환값 : 없음
+     * 예외 : IllegalArgumentException - 로그를 찾을 수 없을 때
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public void deleteOne(long id) {
         String ownerKey = sessionIdManager.getSessionId();
         int deleted = logRepository.deleteByIdAndOwner(ownerKey, id);
         if (deleted <= 0) throw new IllegalArgumentException("log not found: id=" + id);
     }
 
+    /**
+     * 함수 이름 : deleteMany
+     * 기능 : 여러 로그를 일괄 삭제한다.
+     * 매개변수 : ids - 삭제할 로그 ID 리스트
+     * 반환값 : 삭제된 로그 개수
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     public int deleteMany(List<Long> ids) {
         if (ids == null || ids.isEmpty()) return 0;
         String ownerKey = sessionIdManager.getSessionId();
@@ -143,7 +197,7 @@ public class LogService {
 
     private String toCsv(List<Log> logs) {
         StringBuilder sb = new StringBuilder();
-        sb.append("id,collectedAt,eventType,path,exists,size,lastModifiedTime,hash,entropy,aiLabel,aiScore,aiDetail\n");
+        sb.append("id,collectedAt,eventType,path,exists,size,sizeBefore,sizeAfter,sizeDiff,entropy,entropyBefore,entropyAfter,entropyDiff,extBefore,extAfter,lastModifiedTime,hash,aiLabel,aiScore,aiDetail\n");
 
         for (Log log : logs) {
             LogResponse r = LogResponse.from(log);
@@ -153,9 +207,17 @@ public class LogService {
             sb.append(csvEsc(r.getPath())).append(",");
             sb.append(r.isExists()).append(",");
             sb.append(r.getSize()).append(",");
+            sb.append(r.getSizeBefore() == null ? "" : r.getSizeBefore()).append(",");
+            sb.append(r.getSizeAfter() == null ? "" : r.getSizeAfter()).append(",");
+            sb.append(r.getSizeDiff() == null ? "" : r.getSizeDiff()).append(",");
             sb.append(csvEsc(r.getLastModifiedTime())).append(",");
             sb.append(csvEsc(r.getHash())).append(",");
             sb.append(r.getEntropy() == null ? "" : r.getEntropy()).append(",");
+            sb.append(r.getEntropyBefore() == null ? "" : r.getEntropyBefore()).append(",");
+            sb.append(r.getEntropyAfter() == null ? "" : r.getEntropyAfter()).append(",");
+            sb.append(r.getEntropyDiff() == null ? "" : r.getEntropyDiff()).append(",");
+            sb.append(csvEsc(r.getExtBefore())).append(",");
+            sb.append(csvEsc(r.getExtAfter())).append(",");
             sb.append(csvEsc(r.getAiLabel())).append(",");
             sb.append(r.getAiScore() == null ? "" : r.getAiScore()).append(",");
             sb.append(csvEsc(r.getAiDetail()));

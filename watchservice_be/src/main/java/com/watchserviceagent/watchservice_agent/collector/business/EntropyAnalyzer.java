@@ -8,24 +8,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * 파일의 Shannon 엔트로피를 계산하는 유틸성 컴포넌트.
- *
- * - computeSampleEntropy(Path): 파일에서 최대 maxBytes 만큼 읽어서 샘플 엔트로피를 계산.
- * - computeEntropy(byte[]): 메모리 상의 바이트 배열에 대해 엔트로피 계산.
+ * 클래스 이름 : EntropyAnalyzer
+ * 기능 : 파일의 Shannon 엔트로피를 계산하는 유틸리티 컴포넌트. 암호화된 파일 탐지에 사용된다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
  */
 @Component
 public class EntropyAnalyzer {
 
     /**
-     * 파일에서 최대 maxBytes 만큼 읽어 Shannon 엔트로피를 계산한다.
-     *
-     * - 바이트 값 0~255의 출현 빈도를 세고,
-     * - p_i = count_i / N 에 대해
-     *   H = - Σ p_i * log2(p_i) 를 계산한다.
-     *
-     * @param path     대상 파일 경로
-     * @param maxBytes 최대 샘플 바이트 수 (예: 4096)
-     * @return 엔트로피 값 (0 이상, 대략 최대 8 근처)
+     * 함수 이름 : computeSampleEntropy
+     * 기능 : 파일에서 최대 maxBytes 만큼 읽어 Shannon 엔트로피를 계산한다. 바이트 값 0~255의 출현 빈도를 세어 계산한다.
+     * 매개변수 : path - 대상 파일 경로, maxBytes - 최대 샘플 바이트 수 (예: 4096)
+     * 반환값 : double - 엔트로피 값 (0 이상, 대략 최대 8 근처)
+     * 예외 : IOException - 파일 읽기 실패 시
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     public double computeSampleEntropy(Path path, int maxBytes) throws IOException {
         if (maxBytes <= 0) {
@@ -67,14 +65,25 @@ public class EntropyAnalyzer {
     }
 
     /**
-     * 기본 샘플 크기(4096 bytes)로 엔트로피 계산.
+     * 함수 이름 : computeSampleEntropy
+     * 기능 : 기본 샘플 크기(4096 bytes)로 엔트로피를 계산한다.
+     * 매개변수 : path - 대상 파일 경로
+     * 반환값 : double - 엔트로피 값
+     * 예외 : IOException - 파일 읽기 실패 시
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     public double computeSampleEntropy(Path path) throws IOException {
         return computeSampleEntropy(path, 4096);
     }
 
     /**
-     * 메모리 상의 바이트 배열 전체에 대해 엔트로피 계산.
+     * 함수 이름 : computeEntropy
+     * 기능 : 메모리 상의 바이트 배열 전체에 대해 엔트로피를 계산한다.
+     * 매개변수 : data - 바이트 배열
+     * 반환값 : double - 엔트로피 값
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     public double computeEntropy(byte[] data) {
         if (data == null || data.length == 0) {
@@ -97,6 +106,14 @@ public class EntropyAnalyzer {
         return entropy;
     }
 
+    /**
+     * 함수 이름 : log2
+     * 기능 : 밑이 2인 로그를 계산한다.
+     * 매개변수 : x - 입력 값
+     * 반환값 : double - log2(x)
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
+     */
     private double log2(double x) {
         return Math.log(x) / Math.log(2.0);
     }

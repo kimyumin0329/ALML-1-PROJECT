@@ -1,11 +1,19 @@
-// src/hooks/UseNotifications.js
+/**
+ * 파일 이름 : UseNotifications.js
+ * 기능 : 알림 조회를 위한 커스텀 훅. 페이지네이션, 필터링, 검색 기능을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchAlerts, fetchAlertDetail, fetchAlertStats } from '../api/NotificationsApi';
 
 /**
- * useNotifications
- * - 숫자 인자 useNotifications(100) 형태를 legacy로 지원 (size=100)
- * - page는 0-based로 통일
+ * 함수 이름 : useNotifications
+ * 기능 : 알림 조회를 위한 커스텀 훅. 페이지는 0-based로 통일되어 있다.
+ * 매개변수 : initial - 초기 설정 객체 또는 페이지 크기 숫자 (기본값: 100)
+ * 반환값 : Object - 알림 데이터, 페이지네이션, 필터, 로딩 상태 등을 포함한 객체
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
  */
 export function useNotifications(initial = 100) {
   const initialObj = useMemo(() => {
@@ -22,7 +30,7 @@ export function useNotifications(initial = 100) {
   const [level, setLevel] = useState(initialObj.level ?? 'ALL'); // ALL | DANGER | WARNING | SAFE
   const [from, setFrom] = useState(initialObj.from ?? '');
   const [to, setTo] = useState(initialObj.to ?? '');
-  const [sort, setSort] = useState(initialObj.sort ?? 'collectedAt,desc');
+  const [sort, setSort] = useState(initialObj.sort ?? 'createdAt,desc');
 
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);

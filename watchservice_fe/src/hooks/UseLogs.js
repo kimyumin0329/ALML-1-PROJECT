@@ -1,11 +1,19 @@
-// src/hooks/UseLogs.js
+/**
+ * 파일 이름 : UseLogs.js
+ * 기능 : 로그 조회를 위한 커스텀 훅. 페이지네이션, 필터링, 검색 기능을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import { useCallback, useEffect, useState } from 'react';
 import { fetchLogs, fetchRecentLogs } from '../api/LogsApi';
 
 /**
- * useLogs
- * - 프론트는 page를 0-based로 유지
- * - 백엔드 /logs 는 page=1-based 이므로 요청 시 page+1 해서 보낸다
+ * 함수 이름 : useLogs
+ * 기능 : 로그 조회를 위한 커스텀 훅. 프론트엔드는 0-based 페이지를 사용하고 백엔드는 1-based를 사용하므로 변환을 수행한다.
+ * 매개변수 : initialLimit - 초기 페이지 크기 (기본값: 50)
+ * 반환값 : Object - 로그 데이터, 페이지네이션, 필터, 로딩 상태 등을 포함한 객체
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
  */
 export function useLogs(initialLimit = 50) {
   const [logs, setLogs] = useState([]);

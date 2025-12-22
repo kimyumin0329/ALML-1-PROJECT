@@ -10,13 +10,10 @@ import java.util.Map;
 
 
 /**
- * AI 서버 연동을 직접 테스트하기 위한 컨트롤러.
- *
- * ✔ 핵심 파이프라인(Watcher → Collector → Aggregator → AiService)에는 필수는 아님.
- * ✔ 프론트/포스트맨에서 직접 AiPayload를 보내서
- *    - AI 서버가 잘 동작하는지
- *    - 현재 모델이 어떤 라벨/점수를 주는지
- *   확인하는 용도의 디버깅/테스트 엔드포인트.
+ * 클래스 이름 : AiController
+ * 기능 : AI 서버 연동을 직접 테스트하기 위한 REST API 엔드포인트를 제공한다. 디버깅 및 테스트 용도.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
  */
 @RestController
 @RequestMapping("/ai")
@@ -24,24 +21,15 @@ import java.util.Map;
 @Slf4j
 public class AiController {
 
-    private final AiService aiService; // AI 서버 호출 서비스
+    private final AiService aiService;
 
     /**
-     * AI 분석 테스트용 엔드포인트.
-     *
-     * POST /ai/analyze
-     * Body(JSON) 예시:
-     * {
-     *   "fileWriteCount": 14,
-     *   "fileRenameCount": 3,
-     *   "fileDeleteCount": 1,
-     *   "fileModifyCount": 14,
-     *   "fileEncryptLikeCount": 2,
-     *   "changedFilesCount": 18,
-     *   "entropyDiffMean": 0.92,
-     *   "fileSizeDiffMean": 134.5,
-     *   "randomExtensionFlag": 1
-     * }
+     * 함수 이름 : analyze
+     * 기능 : AI 서버에 행위 분석 요청을 보내고 결과를 반환한다. 테스트용 엔드포인트.
+     * 매개변수 : payload - 윈도우 집계된 피처 벡터
+     * 반환값 : AiResult - AI 분석 결과
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     @PostMapping("/analyze")
     public AiResult analyze(@RequestBody AiPayload payload) {
@@ -54,8 +42,12 @@ public class AiController {
     }
 
     /**
-     * 랜섬웨어 패밀리 분류 테스트 엔드포인트(1): AiPayload 그대로 받기
-     * POST /ai/family/predict?topk=5
+     * 함수 이름 : predictFamily
+     * 기능 : AiPayload를 기반으로 랜섬웨어 패밀리 분류를 요청한다. 테스트용 엔드포인트.
+     * 매개변수 : payload - 피처 벡터, topk - 상위 k개 결과 반환 개수
+     * 반환값 : FamilyPredictResponse - 패밀리 분류 결과
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     @PostMapping("/family/predict")
     public FamilyPredictResponse predictFamily(
@@ -69,8 +61,12 @@ public class AiController {
     }
 
     /**
-     * 랜섬웨어 패밀리 분류 테스트 엔드포인트(2): Map으로 받기(유연)
-     * POST /ai/family/predict/features?topk=5
+     * 함수 이름 : predictFamilyByFeatures
+     * 기능 : Map 형태의 피처를 기반으로 랜섬웨어 패밀리 분류를 요청한다. 테스트용 엔드포인트.
+     * 매개변수 : features - 피처 맵, topk - 상위 k개 결과 반환 개수
+     * 반환값 : FamilyPredictResponse - 패밀리 분류 결과
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     @PostMapping("/family/predict/features")
     public FamilyPredictResponse predictFamilyByFeatures(
@@ -86,9 +82,12 @@ public class AiController {
 
 
     /**
-     * 간단 헬스체크용 (원하면 프론트에서 ping 용도로 사용 가능).
-     *
-     * GET /ai/ping
+     * 함수 이름 : ping
+     * 기능 : AI 엔드포인트의 헬스체크를 수행한다.
+     * 매개변수 : 없음
+     * 반환값 : String - "AI endpoint alive"
+     * 작성 날짜 : 2025/12/17
+     * 작성자 : 시스템
      */
     @GetMapping("/ping")
     public String ping() {

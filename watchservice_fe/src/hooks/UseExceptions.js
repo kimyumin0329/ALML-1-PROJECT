@@ -1,3 +1,9 @@
+/**
+ * 파일 이름 : UseExceptions.js
+ * 기능 : 예외 규칙 관리를 위한 커스텀 훅. 예외 규칙 목록 조회, 추가, 삭제 기능을 제공한다.
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 import { useEffect, useState } from 'react';
 import {
   fetchExceptionRules,
@@ -5,6 +11,14 @@ import {
   deleteExceptionRule,
 } from '../api/SettingApi';
 
+/**
+ * 함수 이름 : useExceptions
+ * 기능 : 예외 규칙 관리를 위한 커스텀 훅.
+ * 매개변수 : 없음
+ * 반환값 : Object - 예외 규칙 목록, 로딩 상태, 에러, 새로고침 함수, 예외 추가/삭제 함수를 포함한 객체
+ * 작성 날짜 : 2025/12/17
+ * 작성자 : 시스템
+ */
 export function useExceptions() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
